@@ -1,0 +1,54 @@
+#! /usr/bin/env node
+try {
+	var	waitForRealityserver = require('../'),
+		args = require('yargs')
+				.usage('$0 [--help] -h host -p port [--retries numRetries] [--interval retryInterval (ms)] [--timeout requestTimeout (ms)]')
+				.describe('h', 'Hostname or IP address of the server to check for RealityServer')
+				.demand('h', 'You must specify a hostname or IP address')
+				.nargs('h', 1)
+				.describe('p', 'Port number on which RealityServer is running on the specified host')
+				.demand('p', 'You must specify port number')
+				.nargs('p', 1)
+				.describe('retries', 'Number of times to retry checking for RealityServer before giving up')
+				.default('retries', 10)
+				.nargs('retries', 1)
+				.describe('interval', 'How long to wait between retry attempts')
+				.default('interval', 1000)
+				.nargs('interval', 1)
+				.describe('timeout', 'Timeout for the underlying requests')
+				.default('timeout', 2500)
+				.nargs('timeout', 1)
+				.help('help')
+				.example('$0 -h 127.0.0.1 -p 8080 --retries 15 --interval 2500 --timeout 1000')
+				.argv;
+} catch(e) {
+	console.error("Required modules not found. Please run 'npm install' to install modules.");
+	process.exit(1);
+}
+
+waitForRealityserver(
+	args.h, // hostname
+	args.p, // port
+	{ // options
+		numRetries: args.retries,
+		retryInterval: args.interval,
+		requestTimeout: args.timeout
+	},
+	function(err, resp) { // main callback to fire
+		if (err) {
+			console.error("wait-for-realityserver: " + err.message);
+			process.exit(1);
+			return;
+		}
+		console.log("wait-for-realityserver: Version " + resp.version + " is now available.")
+		process.exit(0);
+	},
+	function(progress) { // progress callback called with each retry
+		console.info(
+			"wait-for-realityserver: Waiting for RealityServer to become available. Used " + 
+			(progress.numRetries - progress.retriesRemaining) + 
+			" of " + progress.numRetries + " retries, retrying in " + 
+			progress.retryInterval + "ms"
+		)
+	}
+);

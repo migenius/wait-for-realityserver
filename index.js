@@ -14,11 +14,11 @@ module.exports = function(host, port, options, successCallback, progressCallback
 	var retriesRemaining = numRetries;
 	var retryInterval = options.retryInterval || 1000;
 	var requestTimeout = options.requestTimeout || 2500;
-	var timer = null;
 
 	// Validate the supplied options
 	if (!(retriesRemaining > 0)) throw new Error('Invalid value for option "numRetries"');
 	if (!(retryInterval > 0)) throw new Error('Invalid value for option "retryInterval"');
+	if (!(requestTimeout > 0)) throw new Error('Invalid value for option "requestTimeout"');
 
 	// RealityServer JSON-RPC 2.0 request to obtain version number
 	var body = {
@@ -30,12 +30,6 @@ module.exports = function(host, port, options, successCallback, progressCallback
 
 	// Attempt to get the RealityServer version and retry on failure
 	function tryToConnect() {
-
-		clearTimeout(timer);
-		timer = null;
-
-		if (--retriesRemaining < 0) return successCallback(new Error('Out of retries'));
-
 		request({
 			method: 'POST',
 			uri: 'http://' + host + ":" + port + "/",
@@ -44,6 +38,7 @@ module.exports = function(host, port, options, successCallback, progressCallback
 		}, function(error, response, body) {
 			if(error || typeof body.result !== 'string') {
 				typeof progressCallback === 'function' && progressCallback({numRetries: numRetries, retriesRemaining: retriesRemaining, retryInterval: retryInterval});
+				if (--retriesRemaining < 0) return successCallback(new Error('Retry limit reached, RealityServer not available'));
 				setTimeout(tryToConnect, retryInterval);
 				return;				
 			}

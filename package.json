@@ -21,6 +21,10 @@
   },
   "homepage": "https://github.com/migenius/wait-for-realityserver#readme",
   "dependencies": {
-    "request": "^2.69.0"
+    "request": "^2.69.0",
+    "yargs": "^4.2.0"
+  },
+  "bin" : {
+    "wait-for-realityserver" : "./bin/wait-for-realityserver"
   }
 }
