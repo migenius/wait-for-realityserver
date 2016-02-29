@@ -1,0 +1,26 @@
+{
+  "name": "wait-for-realityserver",
+  "version": "1.0.0",
+  "description": "Wait for RealityServer to be available and then fire a callback",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/migenius/wait-for-realityserver.git"
+  },
+  "keywords": [
+    "RealityServer",
+    "migenius"
+  ],
+  "author": "Paul Arden <paul@migenius.com> (http://www.migenius.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/migenius/wait-for-realityserver/issues"
+  },
+  "homepage": "https://github.com/migenius/wait-for-realityserver#readme",
+  "dependencies": {
+    "request": "^2.69.0"
+  }
+}
