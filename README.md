@@ -74,7 +74,7 @@ waitForRealityserver(
 		)
 	}
 ).then(function(result) {
-	console.log("RealityServer version " + resp.version + " now available.")
+	console.log("RealityServer version " + result.version + " now available.")
 }).catch(err => {
 	console.error(err.message);
 });
@@ -93,7 +93,7 @@ waitForRealityserver(
 		monitorFrequency: 10000 // check for connection every 10 seconds
 	}
 ).then(function(result) {
-	console.log("RealityServer version " + resp.version + " now available.")
+	console.log("RealityServer version " + result.version + " now available.")
 	result.on('disconnected',() => {
 		console.log('RS is no longer connectable');
 		// tell application to stop trying to use RealityServer
