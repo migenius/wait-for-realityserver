@@ -9,6 +9,10 @@ module.exports = function(host, port, options, successCallback, progressCallback
 		options = {};
 	}
 
+	if (typeof successCallback !== 'function') {
+		throw 'successCallback is not a function';
+	}
+	
 	// Sensible defaults
 	var numRetries = options.numRetries || 10;
 	var retriesRemaining = numRetries;
