@@ -1,4 +1,5 @@
 var request = require('request').defaults({jar: true});
+var EventEmitter = require('events');
 
 module.exports = function(host, port, options, successCallback, progressCallback) {
 
@@ -21,6 +22,7 @@ module.exports = function(host, port, options, successCallback, progressCallback
 	var retriesRemaining = numRetries;
 	var retryInterval = options.retryInterval || 1000;
 	var requestTimeout = options.requestTimeout || 2500;
+	var monitorFrequency = parseInt(options.monitorFrequency,10) || 0;
 
 	// Validate the supplied options
 	if (!(retriesRemaining > 0)) throw new Error('Invalid value for option "numRetries"');
@@ -34,6 +36,41 @@ module.exports = function(host, port, options, successCallback, progressCallback
 		params: {},
 		id: 1
 	};
+
+	function setupResult(body) {
+		if (monitorFrequency <= 0) {
+			return { version: body.result }
+		}
+		var emitter = new EventEmitter()
+
+		var connectable = true;
+		function checkRealityServer() {
+			// we just want to check connectability
+			request({
+				method: 'GET',
+				uri: 'http://' + host + ':' + port + '/',
+				timeout: requestTimeout
+			}, function(error, response, body) {
+				if (error) {
+					if (connectable) {
+						emitter.emit('disconnected')
+						connectable = false;
+					}
+				} else if (!connectable) {
+					emitter.emit('connected');
+					connectable = true;
+				}
+			});
+		}
+		var timer = setInterval(checkRealityServer,monitorFrequency);
+
+		emitter.version = body.result;
+		emitter.stop = function() {
+			clearInterval(timer);
+			timer = undefined;
+		}
+		return emitter;
+	}
 
 	// Attempt to get the RealityServer version and retry on failure
 	function tryToConnect() {
@@ -77,7 +114,7 @@ module.exports = function(host, port, options, successCallback, progressCallback
 								return;				
 							}
 							if (retriesRemaining > 0) {
-								successCallback(null, {version: versionBody.result});
+								successCallback(null, setupResult(versionBody));
 							}
 						});
 					}
