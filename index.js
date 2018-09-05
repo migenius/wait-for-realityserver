@@ -3,16 +3,19 @@ var request = require('request').defaults({jar: true});
 module.exports = function(host, port, options, successCallback, progressCallback) {
 
 	// Allow for missing options
-	if (typeof options == "function") {
+	if (options === undefined || typeof options === 'function') {
 		progressCallback = successCallback;
 		successCallback = options;
 		options = {};
 	}
 
-	if (typeof successCallback !== 'function') {
-		throw 'successCallback is not a function';
+	if (progressCallback === undefined) {
+		// only 1 function passed in.
+		// in this case we use it as a progressCallback and return a promise
+		progressCallback = successCallback;
+		successCallback = undefined;
 	}
-	
+
 	// Sensible defaults
 	var numRetries = options.numRetries || 10;
 	var retriesRemaining = numRetries;
@@ -27,7 +30,7 @@ module.exports = function(host, port, options, successCallback, progressCallback
 	// RealityServer JSON-RPC 2.0 request to obtain version number
 	var command = {
 		jsonrpc: 2.0,
-		method: "get_version",
+		method: 'get_version',
 		params: {},
 		id: 1
 	};
@@ -36,7 +39,7 @@ module.exports = function(host, port, options, successCallback, progressCallback
 	function tryToConnect() {
 		request({ // Attempt to make UAC session first
 			method: 'GET',
-			uri: 'http://' + host + ":" + port + "/uac/create/",
+			uri: 'http://' + host + ':' + port + '/uac/create/',
 			timeout: requestTimeout					
 		}, function(error, response, body) {
 			if (error) {
@@ -49,7 +52,7 @@ module.exports = function(host, port, options, successCallback, progressCallback
 			if (retriesRemaining > 0) {
 				request({
 					method: 'POST',
-					uri: 'http://' + host + ":" + port + "/",
+					uri: 'http://' + host + ':' + port + '/',
 					json: command,
 					timeout: requestTimeout					
 				}, function(error, response, versionBody) {
@@ -63,7 +66,7 @@ module.exports = function(host, port, options, successCallback, progressCallback
 					if (retriesRemaining > 0) {
 						request({
 							method: 'GET',
-							uri: 'http://' + host + ":" + port + "/uac/destroy/",
+							uri: 'http://' + host + ':' + port + '/uac/destroy/',
 							timeout: requestTimeout					
 						}, function(error, response, body) {
 							if (error) {
@@ -84,5 +87,21 @@ module.exports = function(host, port, options, successCallback, progressCallback
 	}
 
 	// Kick off the process
-	tryToConnect();
+	if (successCallback === undefined) {
+		if (typeof Promise !== 'function') {
+			throw 'No successCallback provided but Promises are not supported';
+		}
+		return new Promise(function(resolve,reject) {
+			successCallback = function(err,result) {
+				if (err) {
+					reject(err);
+				} else {
+					resolve(result);
+				}
+			}
+			tryToConnect();
+		});
+	} else {
+		tryToConnect();
+	}
 };
