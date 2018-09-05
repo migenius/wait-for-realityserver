@@ -24,7 +24,7 @@ See below for usage of both.
 
 Here is a simple example showing how to use the module. Note that the options and callbacks can be omitted. If no callbacks are provided then a Promise is returned. All basic options are shown below, you can specify partial options if desired as well.
 
-####Callback example
+#### Callback Example
 ```javascript
 var waitForRealityserver = require('wait-for-realityserver');
 
@@ -54,7 +54,7 @@ waitForRealityserver(
 ```
 
 If one or zero functions are provided after the hostname and port then a Promise is returned. If a single function is provided then this is used as the progress callback.
-####Promise example
+#### Promise Example
 ```javascript
 var waitForRealityserver = require('wait-for-realityserver');
 
@@ -80,7 +80,7 @@ waitForRealityserver(
 });
 ```
 
-####Monitoring
+#### Monitoring
 The module also support monitoring the RealityServer instance. If the `monitorFrequency` option is provided, and is > 0, then the result is an `EventEmitter` that attempts to connect to RealityServer every `monitorFrequency` milliseconds. If the connection attempt fails a `disconnected` event is emitted. When the connection succeeds again a `connected` event is emitted. These events are emitted only once for each disconnect and connect occurance. The result additionally has a `stop` function which can be used to stop monitoring if required, EG: when exiting Node.js.
 
 ```javascript
