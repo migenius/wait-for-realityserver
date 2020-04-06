@@ -81,7 +81,7 @@ module.exports = function(host, port, options, successCallback, progressCallback
 		}, function(error, response, body) {
 			if (error) {
 				typeof progressCallback === 'function' && progressCallback({numRetries: numRetries, retriesRemaining: retriesRemaining, retryInterval: retryInterval});
-				if (--retriesRemaining < 0)
+				if (--retriesRemaining <= 0)
 					return successCallback(new Error('Retry limit reached, RealityServer not available'));
 				setTimeout(tryToConnect, retryInterval);
 				return;				
@@ -95,7 +95,7 @@ module.exports = function(host, port, options, successCallback, progressCallback
 				}, function(error, response, versionBody) {
 					if (error || typeof versionBody.result !== 'string') {
 						typeof progressCallback === 'function' && progressCallback({numRetries: numRetries, retriesRemaining: retriesRemaining, retryInterval: retryInterval});
-						if (--retriesRemaining < 0)
+						if (--retriesRemaining <= 0)
 							return successCallback(new Error('Retry limit reached, RealityServer not available'));
 						setTimeout(tryToConnect, retryInterval);
 						return;				
@@ -108,7 +108,7 @@ module.exports = function(host, port, options, successCallback, progressCallback
 						}, function(error, response, body) {
 							if (error) {
 								typeof progressCallback === 'function' && progressCallback({numRetries: numRetries, retriesRemaining: retriesRemaining, retryInterval: retryInterval});
-								if (--retriesRemaining < 0)
+								if (--retriesRemaining <= 0)
 									return successCallback(new Error('Retry limit reached, RealityServer not available'));
 								setTimeout(tryToConnect, retryInterval);
 								return;				
