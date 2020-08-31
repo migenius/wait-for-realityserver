@@ -1,6 +1,6 @@
 {
   "name": "wait-for-realityserver",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Wait for RealityServer to be available and then fire a callback",
   "main": "index.js",
   "scripts": {
