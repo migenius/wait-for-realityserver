@@ -2,7 +2,7 @@
 try {
 	var	waitForRealityserver = require('../'),
 		args = require('yargs')
-				.usage('$0 [--help] -h host -p port [--retries numRetries] [--interval retryInterval (ms)] [--timeout requestTimeout (ms)]')
+				.usage('$0 [--help] -h host -p port [--secure|--no-secure] [--retries numRetries] [--interval retryInterval (ms)] [--timeout requestTimeout (ms)]')
 				.describe('h', 'Hostname or IP address of the server to check for RealityServer')
 				.demand('h', 'You must specify a hostname or IP address')
 				.nargs('h', 1)
@@ -18,8 +18,12 @@ try {
 				.describe('timeout', 'Timeout for the underlying requests')
 				.default('timeout', 2500)
 				.nargs('timeout', 1)
+				.describe('secure', 'If set uses https rather than http for the requests')
+				.boolean('secure')
+				.default('secure', false)
 				.help('help')
 				.example('$0 -h 127.0.0.1 -p 8080 --retries 15 --interval 2500 --timeout 1000')
+				.example('$0 -h 127.0.0.1 -p 8443 --secure --retries 15 --interval 2500 --timeout 1000')
 				.argv;
 } catch(e) {
 	console.error("Required modules not found. Please run 'npm install' to install modules.");
@@ -32,7 +36,8 @@ waitForRealityserver(
 	{ // options
 		numRetries: args.retries,
 		retryInterval: args.interval,
-		requestTimeout: args.timeout
+		requestTimeout: args.timeout,
+		secure: args.secure
 	},
 	function(err, resp) { // main callback to fire
 		if (err) {

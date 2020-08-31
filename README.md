@@ -34,7 +34,8 @@ waitForRealityserver(
 	{ // options
 		numRetries: 10,
 		retryInterval: 1000,
-		requestTimeout: 2500
+		requestTimeout: 2500,
+		secure: false
 	},
 	function(err, resp) { // main callback to fire
 		if (err) {
@@ -117,8 +118,9 @@ waitForRealityserver(
 The module includes a simple command line program which you can use for integration with shell scripts and other tools. Its usage is as follows:
 
 ```
-wait-for-realityserver [--help] -h host -p port [--retries numRetries]
-[--interval retryInterval (ms)] [--timeout requestTimeout (ms)]
+wait-for-realityserver [--help] -h host -p port [--secure|--no-secure]
+[--retries numRetries] [--interval retryInterval (ms)] [--timeout requestTimeout
+(ms)]
 
 Options:
   -h          Hostname or IP address of the server to check for RealityServer
@@ -129,12 +131,17 @@ Options:
               up                                                   [default: 10]
   --interval  How long to wait between retry attempts            [default: 1000]
   --timeout   Timeout for the underlying requests                [default: 2500]
+  --secure    If set uses https rather than http for the requests
+                                                      [boolean] [default: false]
   --help      Show help                                                [boolean]
 
 Examples:
   wait-for-realityserver -h 127.0.0.1
   -p 8080 --retries 15 --interval 2500
   --timeout 1000
+  wait-for-realityserver -h 127.0.0.1
+  -p 8443 --secure --retries 15 --interval
+  2500 --timeout 1000
 ```
 
 For example, to wait for RealityServer on your local host with up to 20 retry attempts you could do the following:

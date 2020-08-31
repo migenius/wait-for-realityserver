@@ -1,4 +1,4 @@
-var request = require('request').defaults({jar: true});
+var request = require('request').defaults({jar: true, strictSSL :false});
 var EventEmitter = require('events');
 
 module.exports = function(host, port, options, successCallback, progressCallback) {
@@ -23,6 +23,7 @@ module.exports = function(host, port, options, successCallback, progressCallback
 	var retryInterval = options.retryInterval || 1000;
 	var requestTimeout = options.requestTimeout || 2500;
 	var monitorFrequency = parseInt(options.monitorFrequency,10) || 0;
+	var schema = options.secure ? 'https': 'http';
 
 	// Validate the supplied options
 	if (!(retriesRemaining > 0)) throw new Error('Invalid value for option "numRetries"');
@@ -48,7 +49,7 @@ module.exports = function(host, port, options, successCallback, progressCallback
 			// we just want to check connectability
 			request({
 				method: 'GET',
-				uri: 'http://' + host + ':' + port + '/',
+				uri: schema + '://' + host + ':' + port + '/',
 				timeout: requestTimeout
 			}, function(error, response, body) {
 				if (error) {
@@ -76,7 +77,7 @@ module.exports = function(host, port, options, successCallback, progressCallback
 	function tryToConnect() {
 		request({ // Attempt to make UAC session first
 			method: 'GET',
-			uri: 'http://' + host + ':' + port + '/uac/create/',
+			uri: schema + '://' + host + ':' + port + '/uac/create/',
 			timeout: requestTimeout					
 		}, function(error, response, body) {
 			if (error) {
@@ -89,7 +90,7 @@ module.exports = function(host, port, options, successCallback, progressCallback
 			if (retriesRemaining > 0) {
 				request({
 					method: 'POST',
-					uri: 'http://' + host + ':' + port + '/',
+					uri: schema + '://' + host + ':' + port + '/',
 					json: command,
 					timeout: requestTimeout					
 				}, function(error, response, versionBody) {
@@ -103,7 +104,7 @@ module.exports = function(host, port, options, successCallback, progressCallback
 					if (retriesRemaining > 0) {
 						request({
 							method: 'GET',
-							uri: 'http://' + host + ':' + port + '/uac/destroy/',
+							uri: schema + '://' + host + ':' + port + '/uac/destroy/',
 							timeout: requestTimeout					
 						}, function(error, response, body) {
 							if (error) {
